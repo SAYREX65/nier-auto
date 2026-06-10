@@ -287,4 +287,16 @@
   .header__username {
     display: none;
   }
+
+    .header__inner {
+    justify-content: space-between;
+  }
+
+  .header__nav {
+    display: none;
+  }
+
+  .header__actions {
+    margin-left: auto;
+  }
 }
