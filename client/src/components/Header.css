@@ -193,3 +193,98 @@
   padding: 0 4px;
   line-height: 1;
 }
+
+/* Бургер */
+.header__burger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius);
+}
+
+.header__burger span {
+  display: block;
+  height: 2px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  transition: all 0.25s;
+}
+
+.header__burger--open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.header__burger--open span:nth-child(2) {
+  opacity: 0;
+}
+.header__burger--open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Мобильное меню */
+.header__mobile-nav {
+  display: none;
+  flex-direction: column;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  padding: 8px 0;
+}
+
+.mobile-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: var(--fw-bold);
+  transition: background var(--transition);
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+
+.mobile-nav-link:hover {
+  background: var(--bg-elevated);
+}
+
+.mobile-nav-link--btn {
+  color: var(--text-secondary);
+}
+
+.nav-badge--inline {
+  position: static;
+  margin-left: 4px;
+}
+
+@media (max-width: 900px) {
+  .header__burger {
+    display: flex;
+  }
+
+  .header__mobile-nav {
+    display: flex;
+  }
+
+  /* Скрыть Войти/Регистрация из header__actions на мобилке */
+  .header__auth {
+    display: none;
+  }
+
+  .header__logout {
+    display: none;
+  }
+
+  .header__username {
+    display: none;
+  }
+}
