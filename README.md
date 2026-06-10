@@ -72,68 +72,43 @@ Yandex API (AI-подбор)
 ## 📁 Структура проекта
 
 nier-auto/
-├── client/                        # Фронтенд (React)
-│   ├── public/
+├── client/
 │   ├── src/
-│   │   ├── api.ts                 # Axios инстанс
-│   │   ├── types.ts               # TypeScript типы
-│   │   ├── main.tsx               # Точка входа
-│   │   ├── App.tsx                # Роутинг
-│   │   ├── index.css              # Глобальные стили
-│   │   ├── contexts/
-│   │   │   └── CartContext.tsx    # Контекст корзины
-│   │   ├── hooks/
-│   │   │   ├── useAuth.ts         # Хук авторизации
-│   │   │   └── useCart.ts         # Хук корзины
+│   │   ├── api/
+│   │   ├── assets/
 │   │   ├── components/
-│   │   │   ├── Header.tsx         # Шапка сайта
-│   │   │   ├── Header.css
-│   │   │   ├── Footer.tsx         # Подвал сайта
-│   │   │   ├── ProductCard.tsx    # Карточка товара
-│   │   │   └── ProductCard.css
-│   │   └── pages/
-│   │       ├── HomePage.tsx           # Главная
-│   │       ├── CatalogPage.tsx        # Каталог
-│   │       ├── ProductPage.tsx        # Страница товара
-│   │       ├── CartPage.tsx           # Корзина
-│   │       ├── CheckoutPage.tsx       # Оформление заказа
-│   │       ├── OrdersPage.tsx         # Мои заказы
-│   │       ├── LoginPage.tsx          # Вход
-│   │       ├── RegisterPage.tsx       # Регистрация
-│   │       ├── ProfilePage.tsx        # Профиль
-│   │       ├── SellerPage.tsx         # Страница продавца
-│   │       ├── SellerDashboard.tsx    # Кабинет продавца
-│   │       ├── AdminPage.tsx          # Админ панель
-│   │       ├── AiPage.tsx             # AI-подбор
-│   │       ├── ComparePage.tsx        # Сравнение товаров
-│   │       └── ChatsPage.tsx          # Чаты
-│   ├── index.html
-│   ├── vite.config.ts
+│   │   ├── contexts/
+│   │   │   └── CartContext.tsx
+│   │   ├── hooks/
+│   │   │   ├── useAuth.ts
+│   │   │   └── useCart.ts
+│   │   ├── pages/
+│   │   ├── styles/
+│   │   ├── types/
+│   │   ├── api.ts
+│   │   ├── App.css
+│   │   ├── App.tsx
+│   │   ├── index.css
+│   │   ├── main.tsx
+│   │   └── vite-env.d.ts
+│   └── index.html
+│
+├── server/
+│   ├── db/
+│   ├── middleware/
+│   ├── routes/
+│   ├── types/
+│   ├── index.ts
+│   ├── package.json
 │   └── tsconfig.json
 │
-├── server/                        # Бэкенд (Express)
-│   ├── index.ts                   # Точка входа сервера
-│   ├── db/
-│   │   ├── database.ts            # Подключение к SQLite
-│   │   └── migrations.ts          # SQL-миграции
-│   ├── middleware/
-│   │   └── auth.ts                # JWT middleware
-│   └── routes/
-│       ├── auth.ts                # Аутентификация
-│       ├── products.ts            # Товары
-│       ├── orders.ts              # Заказы
-│       ├── sellers.ts             # Продавцы
-│       ├── admin.ts               # Администрирование
-│       ├── ai.ts                  # AI-подбор
-│       └── chats.ts               # Чаты
-│
-├── uploads/                       # Загруженные изображения
-├── .env                           # Переменные окружения
-├── package.json                   # Корневой package.json
+├── node_modules/
+├── .env
+├── .gitignore
+├── .node-version
+├── package.json
 └── README.md
 
-
-text
 
 
 ## 👥 Роли пользователей
@@ -348,7 +323,7 @@ page          — страница (default: 1)
 limit         — товаров на странице (default: 20)
 
 
-text
+
 
 ### Заказы `/api/orders`
 
@@ -603,5 +578,5 @@ CORS настроен на конкретные домены
 
 📄 Лицензия
 
-MIT © 2024 Nier:auto
+MIT © 2026 Nier:auto
 
