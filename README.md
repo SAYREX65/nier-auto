@@ -71,18 +71,57 @@ Yandex API (AI-подбор)
 
 ## 📁 Структура проекта
 
+```text
 nier-auto/
 ├── client/
 │   ├── src/
 │   │   ├── api/
 │   │   ├── assets/
 │   │   ├── components/
+│   │   │   ├── Footer.tsx
+│   │   │   ├── Footer.css
+│   │   │   ├── Header.tsx
+│   │   │   ├── Header.css
+│   │   │   ├── ProductCard.tsx
+│   │   │   ├── ProductCard.css
+│   │   │   ├── ReviewCard.tsx
+│   │   │   ├── ReviewCard.css
+│   │   │   ├── ReviewForm.tsx
+│   │   │   └── ReviewForm.css
 │   │   ├── contexts/
 │   │   │   └── CartContext.tsx
 │   │   ├── hooks/
 │   │   │   ├── useAuth.ts
 │   │   │   └── useCart.ts
 │   │   ├── pages/
+│   │   │   ├── AdminDashboard.tsx
+│   │   │   ├── AdminDashboard.css
+│   │   │   ├── AIDiagnosePage.tsx
+│   │   │   ├── AIDiagnosePage.css
+│   │   │   ├── CartPage.tsx
+│   │   │   ├── CartPage.css
+│   │   │   ├── CatalogPage.tsx
+│   │   │   ├── CatalogPage.css
+│   │   │   ├── ChatsPage.tsx
+│   │   │   ├── ChatsPage.css
+│   │   │   ├── CheckoutPage.tsx
+│   │   │   ├── CheckoutPage.css
+│   │   │   ├── ComparePage.tsx
+│   │   │   ├── ComparePage.css
+│   │   │   ├── HomePage.tsx
+│   │   │   ├── HomePage.css
+│   │   │   ├── LoginPage.tsx
+│   │   │   ├── OrdersPage.tsx
+│   │   │   ├── OrdersPage.css
+│   │   │   ├── ProductPage.tsx
+│   │   │   ├── ProductPage.css
+│   │   │   ├── ProfilePage.tsx
+│   │   │   ├── ProfilePage.css
+│   │   │   ├── RegisterPage.tsx
+│   │   │   ├── SellerDashboard.tsx
+│   │   │   ├── SellerDashboard.css
+│   │   │   ├── SellerPage.tsx
+│   │   │   └── SellerPage.css
 │   │   ├── styles/
 │   │   ├── types/
 │   │   ├── api.ts
@@ -95,8 +134,18 @@ nier-auto/
 │
 ├── server/
 │   ├── db/
+│   │   ├── database.ts
+│   │   ├── migrations.ts
+│   │   └── nier_auto.db
 │   ├── middleware/
 │   ├── routes/
+│   │   ├── admin.ts
+│   │   ├── ai.ts
+│   │   ├── auth.ts
+│   │   ├── chats.ts
+│   │   ├── orders.ts
+│   │   ├── products.ts
+│   │   └── sellers.ts
 │   ├── types/
 │   ├── index.ts
 │   ├── package.json
@@ -108,7 +157,8 @@ nier-auto/
 ├── .node-version
 ├── package.json
 └── README.md
-
+...
+```
 
 
 ## 👥 Роли пользователей
