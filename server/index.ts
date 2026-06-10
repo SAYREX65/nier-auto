@@ -20,14 +20,17 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  origin: process.env.NODE_ENV === 'production' ? '*' : ['http://localhost:3000', 'http://127.0.0.1:3000'],
   credentials: true,
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-// Статика
+// Статика загрузок
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// Статика фронтенда
+app.use(express.static(path.join(__dirname, '../../client/dist')));
 
 // API роуты
 app.use('/api/auth',     authRoutes);
@@ -43,9 +46,9 @@ app.get('/api/health', (_, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// 404
-app.use((_, res) => {
-  res.status(404).json({ error: 'Маршрут не найден' });
+// SPA fallback
+app.get('*', (_, res) => {
+  res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
 });
 
 // Запуск после миграций
