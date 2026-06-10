@@ -1,0 +1,144 @@
+/* Карточки статистики */
+.admin-stat-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.admin-stat-card {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.admin-stat-card__value {
+  font-size: 32px;
+  font-weight: var(--fw-bold);
+  line-height: 1;
+}
+
+.admin-stat-card__label {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Сетка блоков статистики */
+.admin-stats__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.admin-stats__block {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-stat-row:last-child { border-bottom: none; }
+
+.admin-stat-row__count {
+  font-size: 18px;
+  font-weight: var(--fw-bold);
+  color: var(--accent);
+}
+
+/* Таблица */
+.admin-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+.admin-table thead tr {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
+}
+
+.admin-table th {
+  padding: 14px 16px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.admin-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.admin-table tbody tr:last-child td { border-bottom: none; }
+
+.admin-table tbody tr:hover {
+  background: var(--bg-surface);
+}
+
+.admin-table__name {
+  font-size: 14px;
+  font-weight: var(--fw-bold);
+}
+
+.admin-table__role-select {
+  width: auto;
+  padding: 5px 10px;
+  font-size: 12px;
+  height: auto;
+}
+
+/* Кнопка продвижения */
+.admin-promote-btn {
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+}
+
+.admin-promote-btn:hover {
+  border-color: #f0b429;
+  color: #f0b429;
+}
+
+.admin-promote-btn.active {
+  background: rgba(240, 180, 41, 0.1);
+  border-color: #f0b429;
+  color: #f0b429;
+}
+
+@media (max-width: 1024px) {
+  .admin-stat-cards  { grid-template-columns: repeat(2, 1fr); }
+  .admin-stats__grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .admin-stat-cards { grid-template-columns: 1fr 1fr; }
+}

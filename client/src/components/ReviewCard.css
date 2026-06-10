@@ -1,0 +1,85 @@
+.review-card {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Шапка */
+.review-card__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.review-card__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: var(--fw-bold);
+  flex-shrink: 0;
+}
+
+.review-card__meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.review-card__name {
+  font-size: 14px;
+  font-weight: var(--fw-bold);
+}
+
+.review-card__date {
+  font-size: 12px;
+}
+
+/* Звёзды */
+.stars {
+  display: flex;
+  gap: 2px;
+}
+
+.star {
+  font-size: 18px;
+  color: var(--border);
+}
+
+.star--active {
+  color: #f39c12;
+}
+
+/* Текст */
+.review-card__comment {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Изображение */
+.review-card__image-wrap {
+  margin-top: 4px;
+}
+
+.review-card__image {
+  width: 160px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+
+.review-card__image:hover {
+  opacity: 0.85;
+}

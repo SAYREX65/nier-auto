@@ -1,0 +1,131 @@
+.cart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 80px 0;
+  text-align: center;
+}
+
+.cart-empty__icon { font-size: 64px; opacity: 0.3; }
+.cart-empty h2    { font-size: 24px; }
+
+.cart__layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 32px;
+  align-items: start;
+}
+
+/* Товары */
+.cart__items {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  gap: 20px;
+  align-items: center;
+  padding: 16px;
+}
+
+.cart-item__image {
+  width: 80px;
+  height: 80px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-size: 28px;
+}
+
+.cart-item__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cart-item__name {
+  font-size: 15px;
+  font-weight: var(--fw-bold);
+  margin-bottom: 4px;
+  display: block;
+  transition: color var(--transition);
+}
+.cart-item__name:hover { color: var(--accent); }
+
+.cart-item__meta  { font-size: 12px; margin-bottom: 6px; }
+
+.cart-item__price {
+  font-size: 16px;
+  font-weight: var(--fw-bold);
+  color: var(--accent);
+}
+
+.cart-item__controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.cart-item__subtotal {
+  font-size: 16px;
+  font-weight: var(--fw-bold);
+}
+
+/* Итог */
+.cart__summary {
+  padding: 24px;
+  position: sticky;
+  top: 80px;
+}
+
+.summary__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.summary__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.summary__total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: var(--fw-bold);
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.summary__total-price {
+  font-size: 24px;
+  color: var(--accent);
+}
+
+.summary__btn {
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 768px) {
+  .cart__layout { grid-template-columns: 1fr; }
+  .cart-item { grid-template-columns: 60px 1fr; }
+  .cart-item__controls {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}

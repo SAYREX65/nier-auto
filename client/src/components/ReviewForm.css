@@ -1,0 +1,129 @@
+.review-form {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.review-form__title {
+  font-size: 18px;
+  font-weight: var(--fw-bold);
+  margin: 0;
+}
+
+/* Звёзды */
+.star-picker {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.star-picker__star {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: var(--border);
+  cursor: pointer;
+  transition: color var(--transition), transform var(--transition);
+  padding: 0;
+  line-height: 1;
+}
+
+.star-picker__star:hover,
+.star-picker__star.active {
+  color: #f39c12;
+}
+
+.star-picker__star:hover {
+  transform: scale(1.2);
+}
+
+.star-picker__label {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-left: 8px;
+}
+
+/* Табы изображения */
+.review-form__img-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0;
+}
+
+.review-form__img-tab {
+  padding: 6px 14px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  margin-bottom: -1px;
+  transition: all var(--transition);
+}
+
+.review-form__img-tab:hover  { color: var(--text-primary); }
+.review-form__img-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* Файл */
+.review-form__file-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.review-form__file-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.review-form__file-name {
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Превью */
+.review-form__preview {
+  position: relative;
+  display: inline-block;
+  margin-top: 10px;
+}
+
+.review-form__preview-img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  display: block;
+}
+
+.review-form__preview-remove {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}

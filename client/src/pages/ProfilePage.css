@@ -1,0 +1,244 @@
+.profile__layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* Сайдбар */
+.profile__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 80px;
+}
+
+.profile__avatar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+}
+
+.profile__avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--border);
+}
+
+.profile__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile__avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  background: var(--accent-dim);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  font-weight: var(--fw-bold);
+}
+
+.profile__name {
+  font-size: 16px;
+  font-weight: var(--fw-bold);
+}
+
+.profile__role {
+  font-size: 12px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.profile__email {
+  font-size: 13px;
+}
+
+.profile__avatar-btn {
+  width: 100%;
+  font-size: 12px;
+  padding: 6px 12px;
+}
+
+/* Навигация */
+.profile__nav {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.profile__nav-item {
+  text-align: left;
+  padding: 13px 20px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  transition: all var(--transition);
+  border-left: 2px solid transparent;
+}
+
+.profile__nav-item:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.profile__nav-item.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.profile__logout {
+  color: var(--accent) !important;
+}
+
+/* Контент */
+.profile__content {
+  padding: 32px;
+  min-height: 400px;
+}
+
+.profile__section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.profile__form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 400px;
+}
+
+/* Инфо */
+.profile__info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.profile__info-row {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  gap: 20px;
+}
+
+.profile__info-row:last-child {
+  border-bottom: none;
+}
+
+.profile__info-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  min-width: 80px;
+}
+
+.profile__info-value {
+  font-size: 14px;
+  font-weight: var(--fw-bold);
+}
+
+.profile__id {
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+  word-break: break-all;
+}
+
+/* Аватар */
+.avatar-preview {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  margin-bottom: 8px;
+}
+
+.avatar-preview__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-preview__placeholder {
+  width: 100%;
+  height: 100%;
+  background: var(--accent-dim);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: var(--fw-bold);
+}
+
+.avatar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.avatar-section__title {
+  font-size: 14px;
+  font-weight: var(--fw-bold);
+}
+
+.avatar-url-form {
+  display: flex;
+  gap: 8px;
+}
+
+/* Сообщения */
+.form-success {
+  color: #48c78e;
+  font-size: 14px;
+  padding: 12px 16px;
+  background: rgba(72, 199, 142, 0.1);
+  border-radius: var(--radius);
+  border: 1px solid #48c78e;
+}
+
+.form-error {
+  color: var(--accent);
+  font-size: 14px;
+  padding: 12px 16px;
+  background: var(--accent-dim);
+  border-radius: var(--radius);
+  border: 1px solid var(--accent);
+}
+
+/* Бейджи ролей */
+.badge-buyer  { background: rgba(52,152,219,0.12); color: #3498db; }
+.badge-seller { background: rgba(243,156,18,0.12);  color: #f39c12; }
+.badge-admin  { background: var(--accent-dim);       color: var(--accent); }
+
+@media (max-width: 768px) {
+  .profile__layout {
+    grid-template-columns: 1fr;
+  }
+  .profile__sidebar {
+    position: static;
+  }
+  .profile__content {
+    padding: 20px;
+  }
+}

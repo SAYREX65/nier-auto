@@ -1,0 +1,30 @@
+:root {
+  /* Цвета фона */
+  --bg:          #0a0a0a;
+  --bg-surface:  #111111;
+  --bg-elevated: #1a1a1a;
+
+  /* Текст */
+  --text-primary:   #f0f0f0;
+  --text-secondary: #a0a0a0;
+  --text-muted:     #606060;
+
+  /* Акцент (красный — автомотив) */
+  --accent:       #e63946;
+  --accent-hover: #c1121f;
+  --accent-dim:   rgba(230, 57, 70, 0.12);
+
+  /* Границы */
+  --border:       #222222;
+  --border-hover: #333333;
+
+  /* Прочее */
+  --radius:    6px;
+  --radius-lg: 12px;
+  --transition: 150ms ease;
+  --fw-bold:    600;
+
+  /* Тени */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
+}

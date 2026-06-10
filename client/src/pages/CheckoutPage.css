@@ -1,0 +1,108 @@
+.checkout__layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 32px;
+  align-items: start;
+}
+
+.checkout__form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.checkout__section { padding: 24px; }
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.form-error {
+  color: var(--accent);
+  font-size: 14px;
+  padding: 12px 16px;
+  background: var(--accent-dim);
+  border-radius: var(--radius);
+  border: 1px solid var(--accent);
+}
+
+/* Способ оплаты */
+.payment-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.payment-option { cursor: pointer; }
+.payment-option input { display: none; }
+
+.payment-option__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 13px;
+  color: var(--text-secondary);
+  transition: all var(--transition);
+}
+
+.payment-option__card.active {
+  border-color: var(--accent);
+  color: var(--text-primary);
+  background: var(--accent-dim);
+}
+
+.payment-option__icon { font-size: 24px; }
+
+.checkout__submit {
+  width: 100%;
+  justify-content: center;
+  padding: 14px;
+  font-size: 15px;
+}
+
+/* Сводка */
+.checkout__summary {
+  padding: 24px;
+  position: sticky;
+  top: 80px;
+}
+
+.checkout-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.checkout-item:last-of-type { border-bottom: none; }
+.checkout-item__name { color: var(--text-secondary); line-height: 1.4; }
+.checkout-item__price { font-weight: var(--fw-bold); white-space: nowrap; }
+
+.checkout__total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: var(--fw-bold);
+  margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+  .checkout__layout { grid-template-columns: 1fr; }
+  .payment-options { grid-template-columns: 1fr; }
+}

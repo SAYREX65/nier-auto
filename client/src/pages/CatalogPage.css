@@ -1,0 +1,121 @@
+.catalog__layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+/* Сайдбар */
+.catalog__sidebar {
+  position: sticky;
+  top: 80px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sidebar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sidebar__header h3 {
+  font-size: 14px;
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Тулбар */
+
+.catalog__toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.catalog__search { 
+  width: 100%;
+}
+
+.catalog__sort { 
+  width: 200px;
+  align-self: flex-end;
+}
+
+.catalog__count {
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+/* Состояния */
+.catalog__loading,
+.catalog__empty {
+  text-align: center;
+  padding: 60px 0;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Пагинация */
+.catalog__pagination {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+
+.pagination__btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 14px;
+  transition: all var(--transition);
+}
+
+.pagination__btn:hover,
+.pagination__btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+@media (max-width: 768px) {
+  .catalog__layout {
+    grid-template-columns: 1fr;
+  }
+  .catalog__sidebar {
+    position: static;
+  }
+  .catalog__toolbar {
+    flex-direction: column;
+  }
+  .catalog__sort { width: 100%; }
+}
