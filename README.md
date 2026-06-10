@@ -1,345 +1,607 @@
-# README.md
+# Nier:auto — Маркетплейс автозапчастей
 
-```markdown
-# Nier:auto — Платформа для покупки и продажи автозапчастей
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)
 
-Дипломный проект. Fullstack веб-приложение на React + TypeScript + Express + SQLite.
+Полноценный маркетплейс автозапчастей с поддержкой ролей пользователей,
+AI-подбором деталей, чатом между покупателями и продавцами, системой заказов
+и административной панелью.
 
 ---
 
-## 🛠 Технологический стек
+## 📋 Содержание
 
-### Клиент
-- React 18 + TypeScript
-- React Router v6
-- Axios
-- Vite
+- [Технологии](#технологии)
+- [Архитектура](#архитектура)
+- [Структура проекта](#структура-проекта)
+- [Роли пользователей](#роли-пользователей)
+- [Функционал](#функционал)
+- [API](#api)
+- [База данных](#база-данных)
+- [Установка и запуск](#установка-и-запуск)
+- [Деплой](#деплой)
+- [Переменные окружения](#переменные-окружения)
 
-### Сервер
-- Node.js + Express
-- TypeScript
-- better-sqlite3 (SQLite)
-- JWT авторизация
-- bcryptjs
+---
+
+## 🛠 Технологии
+
+### Backend
+| Технология | Версия | Назначение |
+|---|---|---|
+| Node.js | ≥ 18 | Среда выполнения |
+| Express | 4.x | HTTP-сервер |
+| TypeScript | 5.x | Типизация |
+| SQLite3 | 5.x | База данных |
+| JWT | 9.x | Аутентификация |
+| bcrypt | 5.x | Хеширование паролей |
+| Multer | 1.x | Загрузка файлов |
+| YandexAi SDK | 4.x | AI-подбор запчастей |
+
+### Frontend
+| Технология | Версия | Назначение |
+|---|---|---|
+| React | 18.x | UI-фреймворк |
+| TypeScript | 5.x | Типизация |
+| Vite | 5.x | Сборщик |
+| React Router | 6.x | Маршрутизация |
+| Axios | 1.x | HTTP-клиент |
+| CSS Modules | — | Стилизация |
+
+---
+
+## 🏗 Архитектура
+Клиент (React + Vite)
+↕ HTTP / REST API
+Сервер (Express + TypeScript)
+↕
+SQLite3 (база данных)
+↕
+Yandex API (AI-подбор)
+
+
+- **Монорепозиторий** — клиент и сервер в одном репозитории
+- **REST API** — все взаимодействия через `/api/*`
+- **JWT** — токен хранится в `localStorage`, передаётся в заголовке `Authorization: Bearer <token>`
+- **Статика** — в продакшене сервер раздаёт собранный фронтенд из `client/dist`
+- **Миграции** — при старте сервера автоматически выполняются SQL-миграции
 
 ---
 
 ## 📁 Структура проекта
 
-```
 nier-auto/
-├── client/                  # React приложение
+├── client/                        # Фронтенд (React)
+│   ├── public/
 │   ├── src/
-│   │   ├── api/             # Axios клиент
-│   │   ├── components/      # Общие компоненты (Header, Footer, ProductCard)
-│   │   ├── hooks/           # useAuth, useCart
-│   │   ├── pages/           # Все страницы
-│   │   ├── styles/          # Глобальные стили
-│   │   └── types/           # TypeScript типы
+│   │   ├── api.ts                 # Axios инстанс
+│   │   ├── types.ts               # TypeScript типы
+│   │   ├── main.tsx               # Точка входа
+│   │   ├── App.tsx                # Роутинг
+│   │   ├── index.css              # Глобальные стили
+│   │   ├── contexts/
+│   │   │   └── CartContext.tsx    # Контекст корзины
+│   │   ├── hooks/
+│   │   │   ├── useAuth.ts         # Хук авторизации
+│   │   │   └── useCart.ts         # Хук корзины
+│   │   ├── components/
+│   │   │   ├── Header.tsx         # Шапка сайта
+│   │   │   ├── Header.css
+│   │   │   ├── Footer.tsx         # Подвал сайта
+│   │   │   ├── ProductCard.tsx    # Карточка товара
+│   │   │   └── ProductCard.css
+│   │   └── pages/
+│   │       ├── HomePage.tsx           # Главная
+│   │       ├── CatalogPage.tsx        # Каталог
+│   │       ├── ProductPage.tsx        # Страница товара
+│   │       ├── CartPage.tsx           # Корзина
+│   │       ├── CheckoutPage.tsx       # Оформление заказа
+│   │       ├── OrdersPage.tsx         # Мои заказы
+│   │       ├── LoginPage.tsx          # Вход
+│   │       ├── RegisterPage.tsx       # Регистрация
+│   │       ├── ProfilePage.tsx        # Профиль
+│   │       ├── SellerPage.tsx         # Страница продавца
+│   │       ├── SellerDashboard.tsx    # Кабинет продавца
+│   │       ├── AdminPage.tsx          # Админ панель
+│   │       ├── AiPage.tsx             # AI-подбор
+│   │       ├── ComparePage.tsx        # Сравнение товаров
+│   │       └── ChatsPage.tsx          # Чаты
 │   ├── index.html
-│   └── vite.config.ts
+│   ├── vite.config.ts
+│   └── tsconfig.json
 │
-├── server/                  # Express сервер
-│   ├── db/                  # База данных и миграции
-│   ├── middleware/          # JWT middleware
-│   ├── routes/              # API маршруты
-│   └── types/               # TypeScript типы
+├── server/                        # Бэкенд (Express)
+│   ├── index.ts                   # Точка входа сервера
+│   ├── db/
+│   │   ├── database.ts            # Подключение к SQLite
+│   │   └── migrations.ts          # SQL-миграции
+│   ├── middleware/
+│   │   └── auth.ts                # JWT middleware
+│   └── routes/
+│       ├── auth.ts                # Аутентификация
+│       ├── products.ts            # Товары
+│       ├── orders.ts              # Заказы
+│       ├── sellers.ts             # Продавцы
+│       ├── admin.ts               # Администрирование
+│       ├── ai.ts                  # AI-подбор
+│       └── chats.ts               # Чаты
 │
-├── .env                     # Переменные окружения
-└── package.json
-```
+├── uploads/                       # Загруженные изображения
+├── .env                           # Переменные окружения
+├── package.json                   # Корневой package.json
+└── README.md
+
+
+text
+
+
+## 👥 Роли пользователей
+
+### 🛒 Покупатель (`buyer`)
+- Регистрация и вход
+- Просмотр каталога и карточек товаров
+- Поиск и фильтрация товаров
+- Добавление в корзину
+- Оформление заказов
+- Просмотр истории заказов
+- Чат с продавцами
+- AI-подбор запчастей
+- Сравнение товаров
+- Редактирование профиля
+
+### 🏪 Продавец (`seller`)
+- Всё что может покупатель
+- Создание и редактирование товаров
+- Загрузка изображений товаров
+- Управление остатками товаров
+- Просмотр входящих заказов
+- Обновление статусов заказов
+- Продвижение товаров (ТОП)
+- Чат с покупателями
+- Просмотр своего публичного профиля
+
+### 🔑 Администратор (`admin`)
+- Всё что может продавец
+- Управление всеми пользователями
+- Смена ролей пользователей
+- Блокировка пользователей
+- Просмотр всех заказов
+- Управление всеми товарами
+- Полный доступ ко всем чатам
+- Статистика платформы
 
 ---
 
-## ⚙️ Установка и запуск
+## ⚙️ Функционал
 
-### 1. Клонировать репозиторий
+### 🏠 Главная страница
+- Баннер с призывом к действию
+- Секция с топ-товарами (is_promoted = 1)
+- Секция с последними товарами
+- Быстрый поиск
+- Навигация по категориям
 
-```bash
-git clone https://github.com/your-repo/nier-auto.git
-cd nier-auto
-```
+### 📦 Каталог товаров
+- Пагинация товаров
+- Фильтрация по:
+  - Марке автомобиля
+  - Модели автомобиля
+  - Году выпуска
+  - Типу запчасти
+  - Бренду запчасти
+  - Продавцу
+- Сортировка по цене, названию, дате
+- Поиск по названию и OEM-коду
+- Отображение наличия товара
 
-### 2. Установить все зависимости
+### 🔍 Страница товара
+- Фото товара
+- Полная информация:
+  - Название, бренд, OEM-код
+  - Совместимость (марка, модель, год)
+  - Тип запчасти
+  - Наличие на складе
+  - Описание
+- Выбор количества
+- Кнопка добавления в корзину
+- Информация о продавце с рейтингом
+- Кнопка написать продавцу
+- Кнопка сравнить товар
+- Хлебные крошки
 
-```bash
-npm run install:all
-```
+### 🛒 Корзина
+- Список добавленных товаров
+- Изменение количества каждого товара
+- Удаление товара из корзины
+- Очистка всей корзины
+- Итоговая сумма с разбивкой
+- Переход к оформлению заказа
+- Сохранение в `localStorage`
 
-Или вручную:
+### 📝 Оформление заказа
+- Форма с данными доставки:
+  - ФИО получателя
+  - Адрес доставки
+  - Телефон
+  - Комментарий к заказу
+- Выбор способа оплаты
+- Итоговая сумма заказа
+- Подтверждение заказа
 
-```bash
-# Корневые зависимости
-npm install
+### 📋 Мои заказы (покупатель)
+- История всех заказов
+- Статусы заказов:
+  - `pending` — Ожидает обработки
+  - `processing` — В обработке
+  - `shipped` — Отправлен
+  - `delivered` — Доставлен
+  - `cancelled` — Отменён
+- Детали каждого заказа
+- Список товаров в заказе
 
-# Зависимости клиента
-cd client
-npm install
+### 🏪 Кабинет продавца
+- **Товары:**
+  - Список всех своих товаров
+  - Добавление нового товара:
+    - Название, бренд, OEM-код
+    - Марка, модель, год авто
+    - Тип запчасти
+    - Цена и остаток
+    - Описание
+    - Загрузка фото
+    - Продвижение (ТОП)
+  - Редактирование товара
+  - Удаление товара
+- **Заказы:**
+  - Список входящих заказов
+  - Смена статуса заказа
+  - Детали заказа с адресом доставки
 
-# Зависимости сервера
-cd ../server
-npm install
-```
+### 👤 Профиль пользователя
+- Просмотр данных аккаунта
+- Редактирование имени
+- Смена пароля
+- Загрузка аватара (хранится в `localStorage`)
+- Отображение роли
 
-### 3. Настроить переменные окружения
+### 💬 Чаты
+- Список всех чатов
+- Создание чата с продавцом
+- Обмен сообщениями в реальном времени (polling каждые 3 сек)
+- Счётчик непрочитанных сообщений в шапке (polling каждые 5 сек)
+- Отображение времени сообщений
 
-Создай файл `.env` в корне папки `server/`:
+### 🤖 AI-подбор запчастей
+- Чат-интерфейс с AI-ассистентом
+- Подбор запчастей по описанию проблемы
+- История диалога в рамках сессии
+- Интеграция с YandexAi
+- Контекст: ассистент знает о каталоге запчастей
 
-```env
-PORT=3001
-NODE_ENV=development
-JWT_SECRET=nier_auto_super_secret_key_2024
-DB_PATH=./server/db/nier_auto.db
-USE_AI_MOCK=true
-```
+### ⚖️ Сравнение товаров
+- Добавление товаров для сравнения
+- Сравнительная таблица характеристик:
+  - Цена
+  - Бренд
+  - OEM-код
+  - Совместимость
+  - Наличие
+- Удаление товара из сравнения
+- Сохранение в `localStorage`
 
-### 4. Запустить проект
-
-#### Способ 1 — оба сервера одной командой (из корня):
-```bash
-npm run dev
-```
-
-#### Способ 2 — раздельно:
-
-**Терминал 1 — сервер:**
-```bash
-cd server
-npx ts-node-dev --respawn --transpile-only index.ts
-```
-
-**Терминал 2 — клиент:**
-```bash
-cd client
-npm run dev
-```
-
-### 5. Открыть в браузере
-
-```
-http://localhost:3000
-```
-
----
-
-## 👤 Тестовые аккаунты
-
-| Роль | Email | Пароль |
-|------|-------|--------|
-| Администратор | admin@nier.auto | admin123 |
-| Продавец 1 | seller1@nier.auto | seller123 |
-| Продавец 2 | seller2@nier.auto | seller123 |
-| Покупатель 1 | buyer1@nier.auto | buyer123 |
-| Покупатель 2 | buyer2@nier.auto | buyer123 |
-
----
-
-## 🖼 Как добавить изображения товаров
-
-Есть **3 способа** добавить изображение к товару:
-
----
-
-### Способ 1 — Ссылка на внешнее изображение (самый простой)
-
-При добавлении товара в поле **"Ссылка на изображение"** вставь прямую ссылку:
-
-```
-https://example.com/image.jpg
-```
-
-Примеры бесплатных источников изображений:
-
-| Сервис | Пример ссылки |
-|--------|--------------|
-| Unsplash | `https://images.unsplash.com/photo-xxx` |
-| Imgur | `https://i.imgur.com/xxxxx.jpg` |
-| Google Images | Нажми на фото → Открыть изображение → скопируй URL |
-
----
-
-### Способ 2 — Локальные изображения через папку public
-
-1. Создай папку `client/public/images/`
-2. Положи туда изображение, например `brake-disc.jpg`
-3. В поле изображения товара укажи:
-
-```
-/images/brake-disc.jpg
-```
-
-**Структура папки:**
-```
-client/
-└── public/
-    └── images/
-        ├── brake-disc.jpg
-        ├── filter.jpg
-        ├── shock-absorber.jpg
-        └── ...
-```
-
----
-
-### Способ 3 — Через папку uploads на сервере
-
-1. Создай папку `server/uploads/`
-2. Положи туда изображение, например `part1.jpg`
-3. В поле изображения укажи:
-
-```
-/uploads/part1.jpg
-```
-
-**Структура папки:**
-```
-server/
-└── uploads/
-    ├── part1.jpg
-    ├── part2.jpg
-    └── ...
-```
-
-> Сервер уже настроен отдавать файлы из папки `/uploads` —
-> это прописано в `server/index.ts`
+### 🔑 Административная панель
+- **Пользователи:**
+  - Список всех пользователей
+  - Смена роли (buyer / seller / admin)
+  - Блокировка аккаунта
+- **Товары:**
+  - Список всех товаров платформы
+  - Удаление любого товара
+  - Управление продвижением
+- **Заказы:**
+  - Все заказы платформы
+  - Смена статуса любого заказа
+- **Статистика:**
+  - Количество пользователей
+  - Количество товаров
+  - Количество заказов
+  - Общая выручка
 
 ---
 
-### Рекомендации по изображениям
+## 🔌 API
 
-| Параметр | Рекомендация |
-|----------|-------------|
-| Формат | JPG, PNG, WebP |
-| Размер | до 2 МБ |
-| Соотношение сторон | 1:1 (квадрат) или 4:3 |
-| Разрешение | от 400×400px |
+### Аутентификация `/api/auth`
+
+| Метод | Путь | Доступ | Описание |
+|---|---|---|---|
+| POST | `/api/auth/register` | Все | Регистрация |
+| POST | `/api/auth/login` | Все | Вход |
+| GET | `/api/auth/me` | Авторизован | Данные текущего пользователя |
+| PUT | `/api/auth/profile` | Авторизован | Обновление профиля |
+| PUT | `/api/auth/password` | Авторизован | Смена пароля |
+
+### Товары `/api/products`
+
+| Метод | Путь | Доступ | Описание |
+|---|---|---|---|
+| GET | `/api/products` | Все | Список товаров с фильтрами |
+| GET | `/api/products/:id` | Все | Один товар |
+| POST | `/api/products` | Продавец | Создать товар |
+| PUT | `/api/products/:id` | Продавец | Обновить товар |
+| DELETE | `/api/products/:id` | Продавец/Админ | Удалить товар |
+| POST | `/api/products/:id/image` | Продавец | Загрузить фото |
+
+**Query параметры GET `/api/products`:**
+
+search        — поиск по названию/OEM
+car_make      — марка авто
+car_model     — модель авто
+year          — год выпуска
+part_type     — тип запчасти
+brand         — бренд запчасти
+seller_id     — ID продавца
+sort          — поле сортировки (price, name, created_at)
+order         — направление (asc, desc)
+page          — страница (default: 1)
+limit         — товаров на странице (default: 20)
+
+
+text
+
+### Заказы `/api/orders`
+
+| Метод | Путь | Доступ | Описание |
+|---|---|---|---|
+| GET | `/api/orders` | Авторизован | Мои заказы |
+| GET | `/api/orders/:id` | Авторизован | Один заказ |
+| POST | `/api/orders` | Покупатель | Создать заказ |
+| PUT | `/api/orders/:id/status` | Продавец/Админ | Сменить статус |
+| GET | `/api/orders/seller` | Продавец | Заказы продавца |
+
+### Продавцы `/api/sellers`
+
+| Метод | Путь | Доступ | Описание |
+|---|---|---|---|
+| GET | `/api/sellers/:id` | Все | Профиль продавца |
+| GET | `/api/sellers/:id/products` | Все | Товары продавца |
+
+### Администрирование `/api/admin`
+
+| Метод | Путь | Доступ | Описание |
+|---|---|---|---|
+| GET | `/api/admin/users` | Админ | Все пользователи |
+| PUT | `/api/admin/users/:id/role` | Админ | Сменить роль |
+| PUT | `/api/admin/users/:id/block` | Админ | Заблокировать |
+| GET | `/api/admin/orders` | Админ | Все заказы |
+| GET | `/api/admin/stats` | Админ | Статистика |
+| DELETE | `/api/admin/products/:id` | Админ | Удалить товар |
+
+### AI `/api/ai`
+
+| Метод | Путь | Доступ | Описание |
+|---|---|---|---|
+| POST | `/api/ai/chat` | Авторизован | Отправить сообщение AI |
+
+### Чаты `/api/chats`
+
+| Метод | Путь | Доступ | Описание |
+|---|---|---|---|
+| GET | `/api/chats` | Авторизован | Список чатов |
+| POST | `/api/chats` | Авторизован | Создать чат |
+| GET | `/api/chats/:id/messages` | Авторизован | Сообщения чата |
+| POST | `/api/chats/:id/messages` | Авторизован | Отправить сообщение |
+| GET | `/api/chats/unread` | Авторизован | Кол-во непрочитанных |
 
 ---
 
 ## 🗄 База данных
 
-База данных создаётся **автоматически** при первом запуске сервера.
+### Таблица `users`
+```sql
+id          INTEGER PRIMARY KEY AUTOINCREMENT
+name        TEXT NOT NULL
+email       TEXT UNIQUE NOT NULL
+password    TEXT NOT NULL                  -- bcrypt hash
+role        TEXT DEFAULT 'buyer'           -- buyer | seller | admin
+is_blocked  INTEGER DEFAULT 0
+created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
 
-Файл базы данных: `server/db/nier_auto.db`
+Таблица products
 
-### Если нужно сбросить базу данных:
+sql
+id            INTEGER PRIMARY KEY AUTOINCREMENT
+seller_id     INTEGER REFERENCES users(id)
+name          TEXT NOT NULL
+brand         TEXT
+oem_code      TEXT
+car_make      TEXT
+car_model     TEXT
+year          INTEGER
+part_type     TEXT
+price         REAL NOT NULL
+stock         INTEGER DEFAULT 0
+description   TEXT
+image_url     TEXT
+is_promoted   INTEGER DEFAULT 0
+created_at    DATETIME DEFAULT CURRENT_TIMESTAMP
 
-```bash
-# Windows
-cd server/db
-del nier_auto.db
+Таблица orders
 
-# Mac / Linux
-cd server/db
-rm nier_auto.db
-```
+sql
+id              INTEGER PRIMARY KEY AUTOINCREMENT
+buyer_id        INTEGER REFERENCES users(id)
+seller_id       INTEGER REFERENCES users(id)
+total_amount    REAL NOT NULL
+status          TEXT DEFAULT 'pending'
+shipping_name   TEXT
+shipping_addr   TEXT
+shipping_phone  TEXT
+comment         TEXT
+created_at      DATETIME DEFAULT CURRENT_TIMESTAMP
 
-После этого перезапусти сервер — база создастся заново с тестовыми данными.
+Таблица order_items
 
----
+sql
+id          INTEGER PRIMARY KEY AUTOINCREMENT
+order_id    INTEGER REFERENCES orders(id)
+product_id  INTEGER REFERENCES products(id)
+name        TEXT
+price       REAL
+quantity    INTEGER
 
-## 📄 API Маршруты
+Таблица chats
 
-### Авторизация
-| Метод | Маршрут | Описание |
-|-------|---------|----------|
-| POST | /api/auth/register | Регистрация |
-| POST | /api/auth/login | Вход |
-| PUT | /api/auth/change-password | Смена пароля |
+sql
+id          INTEGER PRIMARY KEY AUTOINCREMENT
+buyer_id    INTEGER REFERENCES users(id)
+seller_id   INTEGER REFERENCES users(id)
+created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
 
-### Товары
-| Метод | Маршрут | Описание |
-|-------|---------|----------|
-| GET | /api/products | Список товаров с фильтрами |
-| GET | /api/products/:id | Один товар |
-| POST | /api/products | Добавить товар (продавец) |
-| PUT | /api/products/:id | Обновить товар (продавец) |
-| DELETE | /api/products/:id | Удалить товар (продавец) |
+Таблица messages
 
-### Заказы
-| Метод | Маршрут | Описание |
-|-------|---------|----------|
-| GET | /api/orders | Мои заказы (покупатель) |
-| GET | /api/orders/seller | Заказы продавца |
-| POST | /api/orders | Создать заказ |
-| PUT | /api/orders/:id/status | Изменить статус |
+sql
+id          INTEGER PRIMARY KEY AUTOINCREMENT
+chat_id     INTEGER REFERENCES chats(id)
+sender_id   INTEGER REFERENCES users(id)
+text        TEXT NOT NULL
+is_read     INTEGER DEFAULT 0
+created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
 
-### Продавцы
-| Метод | Маршрут | Описание |
-|-------|---------|----------|
-| GET | /api/sellers | Список продавцов |
-| GET | /api/sellers/:id | Профиль продавца |
-| POST | /api/sellers/:id/reviews | Оставить отзыв |
 
-### Администратор
-| Метод | Маршрут | Описание |
-|-------|---------|----------|
-| GET | /api/admin/stats | Статистика |
-| GET | /api/admin/users | Все пользователи |
-| PUT | /api/admin/users/:id/role | Изменить роль |
-| DELETE | /api/admin/users/:id | Удалить пользователя |
-| DELETE | /api/admin/products/:id | Удалить товар |
-| PUT | /api/admin/products/:id/promote | Продвижение товара |
+🚀 Установка и запуск
 
-### AI
-| Метод | Маршрут | Описание |
-|-------|---------|----------|
-| POST | /api/ai/diagnose | AI подбор запчастей |
+Требования
 
----
 
-## 🔐 Роли пользователей
+Node.js ≥ 18
 
-| Роль | Возможности |
-|------|------------|
-| **buyer** | Просмотр каталога, покупка, заказы, отзывы продавцам |
-| **seller** | Всё что buyer + управление своими товарами и заказами |
-| **admin** | Полный доступ ко всему включая панель администратора |
+npm ≥ 9
 
----
 
-## 📦 Сборка для продакшена
+1. Клонировать репозиторий
 
-```bash
+bash
+git clone https://github.com/your-username/nier-auto.git
+cd nier-auto
+
+2. Установить зависимости
+
+bash
+# Корневые зависимости
+npm install
+
+# Зависимости сервера
+cd server && npm install && cd ..
+
+# Зависимости клиента
+cd client && npm install && cd ..
+
+3. Создать .env
+
+bash
+cp .env.example .env
+
+Заполнить переменные (см. раздел ниже).
+
+
+4. Запуск в режиме разработки
+
+bash
+# Сервер (порт 3001)
+cd server && npm run dev
+
+# Клиент (порт 3000) — в другом терминале
+cd client && npm run dev
+
+5. Сборка для продакшена
+
+bash
 # Собрать клиент
-npm run build:client
+cd client && npm run build
 
-# Запустить сервер в продакшене
-cd server
-npm run build
-npm start
-```
+# Запустить сервер (раздаёт и API и фронтенд)
+cd server && npm run build && npm start
 
----
 
-## 🐛 Частые проблемы
+🌐 Деплой (Render.com)
 
-### Порт занят
-```bash
-# Windows — найти и завершить процесс на порту 3001
-netstat -ano | findstr :3001
-taskkill /PID <номер> /F
-```
+Настройка сервиса
 
-### База данных не создаётся
-Убедись что папка `server/db/` существует:
-```bash
-mkdir server/db
-```
 
-### Ошибка CORS
-Убедись что клиент запущен на порту `3000`,
-а сервер на порту `3001`.
+Type: Web Service
 
-### Модули не найдены
-```bash
-cd server && npm install
-cd ../client && npm install
-```
+Build Command:
+bash
+cd client && npm install && npm run build && cd ../server && npm install && npm run build
 
----
 
-## 👨‍💻 Автор
+Start Command:
+bash
+node server/dist/index.js
 
-Дипломный проект, 2024
-```
+
+Environment: Node
+
+
+Переменные окружения на Render
+
+text
+NODE_ENV=production
+JWT_SECRET=your_secret_key
+YANDEX_API_KEY=your_api_key
+PORT=3001
+
+
+🔐 Переменные окружения
+
+Создай файл .env в корне проекта:
+
+
+env
+# Сервер
+PORT=3001
+NODE_ENV=development
+
+# JWT
+JWT_SECRET=your_very_secret_key_here
+
+# YandexAi (для AI-подбора)
+YandexAi_API_KEY=sk-...
+
+# База данных (путь до файла SQLite)
+DB_PATH=./database.db
+
+
+📱 Адаптивность
+
+Сайт полностью адаптирован под мобильные устройства:
+
+
+Брейкпоинт	Описание
+> 900px	Десктоп — полная навигация в шапке
+≤ 900px	Планшет/мобила — бургер меню
+≤ 600px	Мобила — скрыты второстепенные элементы
+≤ 480px	Маленькие экраны — адаптация карточек товаров
+
+
+🔒 Безопасность
+
+
+Пароли хешируются через bcrypt (10 rounds)
+
+Авторизация через JWT токены (срок: 7 дней)
+
+Проверка роли на каждом защищённом роуте
+
+Загрузка файлов — только изображения, лимит 10MB
+
+CORS настроен на конкретные домены
+
+
+
+📄 Лицензия
+
+MIT © 2024 Nier:auto
+
