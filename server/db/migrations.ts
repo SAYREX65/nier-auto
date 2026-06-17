@@ -369,6 +369,29 @@ async function seedData() {
     'Порог кузова правый. Стальной. Под варку.',
     '/images/door_sill.jpg', 0);
 
+
+  // ── Пары товаров для демонстрации сравнения ──
+
+  // Пара 1: Тормозная система — Brembo к Bosch (Toyota Camry 2020)
+  insertProduct.run(uuidv4(), seller2Id, 'Тормозной диск передний', 'Brembo', '09.A536.11', 'Toyota', 'Camry', 2020, 'Тормозная система', 5400, 4,
+    'Перфорированный тормозной диск Brembo. Диаметр 296 мм. Улучшенный отвод тепла, спортивный характер, итальянское качество.',
+    '/images/compare/brake_disk_brembo.jpg', 0);
+
+  // Пара 2: Подвеска — Bilstein к KYB (BMW 3 Series 2019)
+  insertProduct.run(uuidv4(), seller3Id, 'Амортизатор передний', 'Bilstein', 'B4 22-196153', 'BMW', '3 Series', 2019, 'Подвеска', 8900, 3,
+    'Однотрубный газовый амортизатор Bilstein B4. Спортивный характер, улучшенная управляемость. Оригинальный поставщик BMW.',
+    '/images/compare/shock_bilstein.jpg', 0);
+
+  // Пара 3: Двигатель — Bosch к NGK (Hyundai Solaris 2021)
+  insertProduct.run(uuidv4(), seller1Id, 'Свечи зажигания (к-т 4 шт)', 'Bosch', 'FR7DCX+', 'Hyundai', 'Solaris', 2021, 'Двигатель', 1650, 14,
+    'Комплект 4 шт. Свечи Bosch Super Plus. Платиновый электрод, стабильное искрообразование, ресурс 60 000 км.',
+    '/images/compare/spark_bosch.jpg', 0);
+
+  // Пара 4: Фильтры — Mahle к Mann (VW Golf 2018)
+  insertProduct.run(uuidv4(), seller3Id, 'Фильтр масляный', 'Mahle', 'OC 253', 'Volkswagen', 'Golf', 2018, 'Фильтры', 580, 15,
+    'Масляный фильтр Mahle. Усиленный корпус, высокое давление открытия перепускного клапана. Ресурс 20 000 км.',
+    '/images/compare/oil_filter_mahle.jpg', 0);
+
   // ── Отзывы ──
   const insertReview = db.prepare(`
     INSERT INTO reviews (id, seller_id, reviewer_id, rating, comment)
