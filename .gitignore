@@ -3,4 +3,6 @@ client/node_modules
 server/node_modules
 server/dist
 client/dist
-.env
+.env-e 
+# SQLite DB (создаётся автоматически при старте)
+server/db/*.db

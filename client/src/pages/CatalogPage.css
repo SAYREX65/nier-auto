@@ -119,3 +119,9 @@
   }
   .catalog__sort { width: 100%; }
 }
+@media (max-width: 480px) {
+  .catalog__sidebar { padding: 14px; }
+  .catalog__sort { width: 100%; }
+  .catalog__count { font-size: 12px; }
+  .pagination__btn { width: 32px; height: 32px; font-size: 13px; }
+}

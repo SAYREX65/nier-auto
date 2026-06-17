@@ -153,3 +153,7 @@
   }
   .product-page__price { font-size: 24px; }
 }
+@media (max-width: 480px) {
+  .product-page__price { font-size: 22px; }
+  .product-page__add { width: 100%; justify-content: center; }
+}

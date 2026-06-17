@@ -199,3 +199,12 @@
   }
 }
 
+
+/* ── Глобальный мобильный адаптив ── */
+@media (max-width: 480px) {
+  .container { padding: 0 12px; }
+  .page { padding-top: 16px; }
+  .page-title { font-size: 22px; }
+  .section-title { font-size: 16px; }
+  .card { border-radius: 10px; }
+}

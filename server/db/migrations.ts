@@ -12,7 +12,6 @@ async function hashPassword(password: string): Promise<{ hash: string; salt: str
 }
 
 export async function runMigrations() {
-  // Пользователи — с password_hash и salt (как в auth.ts)
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id            TEXT PRIMARY KEY,
@@ -27,7 +26,6 @@ export async function runMigrations() {
     );
   `);
 
-  // Товары
   db.exec(`
     CREATE TABLE IF NOT EXISTS products (
       id          TEXT PRIMARY KEY,
@@ -48,7 +46,6 @@ export async function runMigrations() {
     );
   `);
 
-  // Заказы
   db.exec(`
     CREATE TABLE IF NOT EXISTS orders (
       id             TEXT PRIMARY KEY,
@@ -62,7 +59,6 @@ export async function runMigrations() {
     );
   `);
 
-  // Позиции заказа
   db.exec(`
     CREATE TABLE IF NOT EXISTS order_items (
       id           TEXT PRIMARY KEY,
@@ -73,7 +69,6 @@ export async function runMigrations() {
     );
   `);
 
-  // Отзывы
   db.exec(`
   CREATE TABLE IF NOT EXISTS reviews (
     id          TEXT PRIMARY KEY,
@@ -87,7 +82,6 @@ export async function runMigrations() {
   );
 `);
 
-  // Индексы
   db.exec(`
     CREATE INDEX IF NOT EXISTS idx_products_seller   ON products(seller_id);
     CREATE INDEX IF NOT EXISTS idx_products_type     ON products(part_type);
@@ -100,7 +94,6 @@ export async function runMigrations() {
   console.log('✅ Миграции выполнены');
   await seedData();
 
-  // Чаты
   db.exec(`
   CREATE TABLE IF NOT EXISTS chats (
   id         TEXT PRIMARY KEY,
@@ -111,7 +104,6 @@ export async function runMigrations() {
 );
 `);
 
-  // Сообщения
   db.exec(`
  CREATE TABLE IF NOT EXISTS messages (
   id         TEXT PRIMARY KEY,
@@ -129,14 +121,12 @@ export async function runMigrations() {
   CREATE INDEX IF NOT EXISTS idx_chats_seller  ON chats(seller_id);
 `);
 
-  // Миграция — добавляем is_read если колонки ещё нет
   try {
     db.exec(`ALTER TABLE messages ADD COLUMN is_read INTEGER NOT NULL DEFAULT 0`);
   } catch {
-    // колонка уже существует — игнорируем
+    // колонка уже существует
   }
 
-  // Миграция — пересоздаём chats без UNIQUE constraint
   try {
     db.exec(`
       CREATE TABLE IF NOT EXISTS chats_new (
@@ -151,7 +141,7 @@ export async function runMigrations() {
       ALTER TABLE chats_new RENAME TO chats;
     `);
   } catch {
-    // уже мигрировано
+    // таблица уже обновлена
   }
 }
 
@@ -166,60 +156,231 @@ async function seedData() {
     VALUES (?, ?, ?, ?, ?, ?)
   `);
 
-  const adminId = uuidv4();
+  const adminId   = uuidv4();
   const seller1Id = uuidv4();
   const seller2Id = uuidv4();
-  const buyer1Id = uuidv4();
-  const buyer2Id = uuidv4();
+  const seller3Id = uuidv4();
+  const buyer1Id  = uuidv4();
+  const buyer2Id  = uuidv4();
 
-  // Хешируем пароли тем же методом что auth.ts
-  const adminHash = await hashPassword('admin123');
+  const adminHash   = await hashPassword('admin123');
   const seller1Hash = await hashPassword('seller123');
   const seller2Hash = await hashPassword('seller123');
-  const buyer1Hash = await hashPassword('buyer123');
-  const buyer2Hash = await hashPassword('buyer123');
+  const seller3Hash = await hashPassword('seller123');
+  const buyer1Hash  = await hashPassword('buyer123');
+  const buyer2Hash  = await hashPassword('buyer123');
 
-  insertUser.run(adminId, 'Администратор', 'admin@nier.auto', adminHash.hash, adminHash.salt, 'admin');
-  insertUser.run(seller1Id, 'АвтоЗапчасти+', 'seller1@nier.auto', seller1Hash.hash, seller1Hash.salt, 'seller');
-  insertUser.run(seller2Id, 'ДеталиПро', 'seller2@nier.auto', seller2Hash.hash, seller2Hash.salt, 'seller');
-  insertUser.run(buyer1Id, 'Иван Петров', 'buyer1@nier.auto', buyer1Hash.hash, buyer1Hash.salt, 'buyer');
-  insertUser.run(buyer2Id, 'Мария Сидорова', 'buyer2@nier.auto', buyer2Hash.hash, buyer2Hash.salt, 'buyer');
+  insertUser.run(adminId,   'Администратор',   'admin@nier.auto',   adminHash.hash,   adminHash.salt,   'admin');
+  insertUser.run(seller1Id, 'АвтоЗапчасти+',  'seller1@nier.auto', seller1Hash.hash, seller1Hash.salt, 'seller');
+  insertUser.run(seller2Id, 'ДеталиПро',       'seller2@nier.auto', seller2Hash.hash, seller2Hash.salt, 'seller');
+  insertUser.run(seller3Id, 'МоторМаркет',     'seller3@nier.auto', seller3Hash.hash, seller3Hash.salt, 'seller');
+  insertUser.run(buyer1Id,  'Иван Петров',      'buyer1@nier.auto',  buyer1Hash.hash,  buyer1Hash.salt,  'buyer');
+  insertUser.run(buyer2Id,  'Мария Сидорова',   'buyer2@nier.auto',  buyer2Hash.hash,  buyer2Hash.salt,  'buyer');
 
-  // Товары
   const insertProduct = db.prepare(`
     INSERT INTO products
       (id, seller_id, name, brand, oem_code, car_make, car_model,
-       year, part_type, price, stock, description, is_promoted)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       year, part_type, price, stock, description, image_url, is_promoted)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
-  insertProduct.run(uuidv4(), seller1Id, 'Тормозной диск передний', 'Bosch', '0 986 479 R84', 'Toyota', 'Camry', 2020, 'Тормозная система', 3200, 5, 'Вентилируемый тормозной диск', 1);
-  insertProduct.run(uuidv4(), seller1Id, 'Колодки тормозные', 'TRW', 'GDB3468', 'Toyota', 'Camry', 2020, 'Тормозная система', 1850, 12, 'Комплект из 4 колодок', 1);
-  insertProduct.run(uuidv4(), seller1Id, 'Амортизатор передний', 'KYB', '334839', 'BMW', '3 Series', 2019, 'Подвеска', 5400, 3, 'Газомасляный амортизатор', 1);
-  insertProduct.run(uuidv4(), seller1Id, 'Фильтр масляный', 'Mann', 'W 712/75', 'Volkswagen', 'Golf', 2018, 'Фильтры', 320, 30, 'Оригинальный масляный фильтр', 0);
-  insertProduct.run(uuidv4(), seller1Id, 'Свечи зажигания (к-т)', 'NGK', 'BKR6EK', 'Hyundai', 'Solaris', 2021, 'Двигатель', 1200, 20, 'Комплект 4 шт.', 0);
-  insertProduct.run(uuidv4(), seller1Id, 'Ремень ГРМ', 'Gates', 'T43218', 'Kia', 'Rio', 2020, 'Двигатель', 2100, 8, 'С натяжителем в комплекте', 0);
-  insertProduct.run(uuidv4(), seller2Id, 'Рулевая тяга', 'Lemförder', '37341 01', 'Audi', 'A4', 2019, 'Рулевое управление', 3800, 4, 'Левая рулевая тяга', 1);
-  insertProduct.run(uuidv4(), seller2Id, 'Шаровая опора', 'Moog', 'TO-BJ-10717', 'Toyota', 'RAV4', 2021, 'Подвеска', 2900, 6, 'Нижняя шаровая опора', 1);
-  insertProduct.run(uuidv4(), seller2Id, 'Термостат', 'Wahler', '4571.87D', 'Ford', 'Focus', 2018, 'Охлаждение', 1650, 10, 'С корпусом в сборе', 0);
-  insertProduct.run(uuidv4(), seller2Id, 'Помпа водяная', 'Hepu', 'P096', 'Volkswagen', 'Passat', 2019, 'Охлаждение', 4200, 2, 'Насос охлаждающей жидкости', 0);
-  insertProduct.run(uuidv4(), seller2Id, 'ШРУС наружный', 'GSP', '861009', 'Nissan', 'Qashqai', 2020, 'Трансмиссия', 6500, 3, 'В сборе с пыльником', 0);
-  insertProduct.run(uuidv4(), seller2Id, 'Аккумулятор 60Ah', 'Varta', 'C22', 'Toyota', 'Corolla', 2019, 'Электрика', 7200, 5, 'Пусковой ток 540A', 0);
-  insertProduct.run(uuidv4(), seller1Id, 'Воздушный фильтр', 'Mann', 'C 35 154/1', 'BMW', 'X5', 2020, 'Фильтры', 850, 15, 'Бумажный воздушный фильтр', 0);
-  insertProduct.run(uuidv4(), seller2Id, 'Стойка стабилизатора', 'Febi', '32198', 'Mercedes', 'C-Class', 2018, 'Подвеска', 1200, 8, 'Передняя стойка', 0);
-  insertProduct.run(uuidv4(), seller1Id, 'Суппорт тормозной', 'ATE', '24.3581-8802.5', 'Skoda', 'Octavia', 2021, 'Тормозная система', 8900, 2, 'Передний левый суппорт', 0);
+  // ── Тормозная система ──
+  insertProduct.run(uuidv4(), seller1Id, 'Тормозной диск передний', 'Bosch', '0 986 479 R84', 'Toyota', 'Camry', 2020, 'Тормозная система', 3200, 5,
+    'Вентилируемый тормозной диск для надёжного торможения. Диаметр 296 мм.',
+    'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80', 1);
 
-  // Отзывы
+  insertProduct.run(uuidv4(), seller1Id, 'Колодки тормозные передние', 'TRW', 'GDB3468', 'Toyota', 'Camry', 2020, 'Тормозная система', 1850, 12,
+    'Комплект из 4 тормозных колодок. Низкий уровень шума, длительный ресурс.',
+    'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&q=80', 1);
+
+  insertProduct.run(uuidv4(), seller1Id, 'Суппорт тормозной передний левый', 'ATE', '24.3581-8802.5', 'Skoda', 'Octavia', 2021, 'Тормозная система', 8900, 2,
+    'Суппорт в сборе с поршнем. Оригинальное качество.',
+    'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller2Id, 'Тормозной шланг задний', 'Cofle', '17.6887', 'Volkswagen', 'Golf', 2019, 'Тормозная система', 680, 18,
+    'Армированный тормозной шланг задней оси. Длина 280 мм.',
+    'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller3Id, 'Диск тормозной задний', 'Brembo', '08.A536.11', 'BMW', '5 Series', 2020, 'Тормозная система', 4100, 4,
+    'Перфорированный диск Brembo. Улучшенный отвод тепла.',
+    'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80', 0);
+
+  // ── Подвеска ──
+  insertProduct.run(uuidv4(), seller1Id, 'Амортизатор передний', 'KYB', '334839', 'BMW', '3 Series', 2019, 'Подвеска', 5400, 3,
+    'Газомасляный амортизатор. Плавный ход, отличная управляемость.',
+    'https://images.unsplash.com/photo-1596838132731-3301c3fd4317?w=400&q=80', 1);
+
+  insertProduct.run(uuidv4(), seller2Id, 'Шаровая опора нижняя', 'Moog', 'TO-BJ-10717', 'Toyota', 'RAV4', 2021, 'Подвеска', 2900, 6,
+    'Нижняя шаровая опора. Усиленная конструкция для длительной эксплуатации.',
+    'https://images.unsplash.com/photo-1596838132731-3301c3fd4317?w=400&q=80', 1);
+
+  insertProduct.run(uuidv4(), seller1Id, 'Стойка стабилизатора передняя', 'Febi', '32198', 'Mercedes', 'C-Class', 2018, 'Подвеска', 1200, 8,
+    'Передняя стойка стабилизатора. Снижает крен в поворотах.',
+    'https://images.unsplash.com/photo-1596838132731-3301c3fd4317?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller3Id, 'Пружина подвески передняя', 'Eibach', 'E20-20-004-01-22', 'Audi', 'A4', 2020, 'Подвеска', 3600, 4,
+    'Пружина передней подвески. Пара (2 шт). Заводское качество.',
+    'https://images.unsplash.com/photo-1596838132731-3301c3fd4317?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller2Id, 'Рычаг подвески нижний', 'Lemförder', '35855 01', 'Volkswagen', 'Passat', 2019, 'Подвеска', 5800, 3,
+    'Нижний рычаг передней подвески в сборе с шаровой.',
+    'https://images.unsplash.com/photo-1596838132731-3301c3fd4317?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller3Id, 'Амортизатор задний', 'Sachs', '315 019', 'Honda', 'CR-V', 2021, 'Подвеска', 4200, 5,
+    'Задний газомасляный амортизатор. Оригинальный размер.',
+    'https://images.unsplash.com/photo-1596838132731-3301c3fd4317?w=400&q=80', 0);
+
+  // ── Рулевое управление ──
+  insertProduct.run(uuidv4(), seller2Id, 'Рулевая тяга левая', 'Lemförder', '37341 01', 'Audi', 'A4', 2019, 'Рулевое управление', 3800, 4,
+    'Левая рулевая тяга. Точная управляемость, оригинальное качество.',
+    'https://images.unsplash.com/photo-1609630875171-b1321377ee65?w=400&q=80', 1);
+
+  insertProduct.run(uuidv4(), seller1Id, 'Наконечник рулевой тяги', 'TRW', 'JTE1231', 'Hyundai', 'Tucson', 2020, 'Рулевое управление', 1450, 10,
+    'Наконечник рулевой тяги. Усиленный шарнир.',
+    'https://images.unsplash.com/photo-1609630875171-b1321377ee65?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller3Id, 'Рейка рулевая', 'JTEKT', '45510-42190', 'Toyota', 'Corolla', 2021, 'Рулевое управление', 18500, 1,
+    'Рулевая рейка в сборе. Восстановленная, с гарантией.',
+    'https://images.unsplash.com/photo-1609630875171-b1321377ee65?w=400&q=80', 0);
+
+  // ── Двигатель ──
+  insertProduct.run(uuidv4(), seller1Id, 'Свечи зажигания (к-т 4 шт)', 'NGK', 'BKR6EK', 'Hyundai', 'Solaris', 2021, 'Двигатель', 1200, 20,
+    'Комплект 4 шт. Иридиевые электроды, увеличенный ресурс 60 000 км.',
+    'https://images.unsplash.com/photo-1632823469850-2f77cd9d5d6b?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller1Id, 'Ремень ГРМ с натяжителем', 'Gates', 'T43218', 'Kia', 'Rio', 2020, 'Двигатель', 2100, 8,
+    'Комплект ГРМ: ремень + натяжитель + ролик. Ресурс 90 000 км.',
+    'https://images.unsplash.com/photo-1632823469850-2f77cd9d5d6b?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller3Id, 'Прокладка головки блока', 'Elring', '458.490', 'Ford', 'Focus', 2019, 'Двигатель', 3200, 6,
+    'Прокладка ГБЦ. Многослойная сталь. Оригинальный размер.',
+    'https://images.unsplash.com/photo-1632823469850-2f77cd9d5d6b?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller2Id, 'Цепь ГРМ', 'Iwis', '59156', 'BMW', '1 Series', 2020, 'Двигатель', 4800, 3,
+    'Цепь привода ГРМ. Усиленная конструкция.',
+    'https://images.unsplash.com/photo-1632823469850-2f77cd9d5d6b?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller3Id, 'Катушка зажигания', 'Bosch', '0 221 604 115', 'Volkswagen', 'Polo', 2021, 'Двигатель', 2600, 9,
+    'Катушка зажигания. Стабильное искрообразование.',
+    'https://images.unsplash.com/photo-1632823469850-2f77cd9d5d6b?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller1Id, 'Маслосъёмные колпачки (к-т)', 'Corteco', '49468537', 'Nissan', 'Qashqai', 2019, 'Двигатель', 890, 15,
+    'Комплект маслосъёмных колпачков для двигателя MR20DE.',
+    'https://images.unsplash.com/photo-1632823469850-2f77cd9d5d6b?w=400&q=80', 0);
+
+  // ── Фильтры ──
+  insertProduct.run(uuidv4(), seller1Id, 'Фильтр масляный', 'Mann', 'W 712/75', 'Volkswagen', 'Golf', 2018, 'Фильтры', 320, 30,
+    'Оригинальный масляный фильтр. Тонкость очистки 20 мкм.',
+    'https://images.unsplash.com/photo-1630916277839-d1eedbc27df5?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller1Id, 'Воздушный фильтр', 'Mann', 'C 35 154/1', 'BMW', 'X5', 2020, 'Фильтры', 850, 15,
+    'Бумажный воздушный фильтр. Эффективность фильтрации 99,5%.',
+    'https://images.unsplash.com/photo-1630916277839-d1eedbc27df5?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller2Id, 'Фильтр топливный', 'Bosch', '0 450 906 508', 'Mercedes', 'E-Class', 2019, 'Фильтры', 1100, 12,
+    'Топливный фильтр тонкой очистки. Ресурс 30 000 км.',
+    'https://images.unsplash.com/photo-1630916277839-d1eedbc27df5?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller3Id, 'Фильтр салонный угольный', 'Filtron', 'K 1175A', 'Toyota', 'Camry', 2021, 'Фильтры', 650, 25,
+    'Угольный фильтр салона. Поглощает запахи и вредные газы.',
+    'https://images.unsplash.com/photo-1630916277839-d1eedbc27df5?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller2Id, 'Фильтр АКПП', 'Febi', '38745', 'BMW', '5 Series', 2020, 'Фильтры', 1850, 7,
+    'Фильтр-сетка масляного поддона АКПП.',
+    'https://images.unsplash.com/photo-1630916277839-d1eedbc27df5?w=400&q=80', 0);
+
+  // ── Охлаждение ──
+  insertProduct.run(uuidv4(), seller2Id, 'Термостат в сборе', 'Wahler', '4571.87D', 'Ford', 'Focus', 2018, 'Охлаждение', 1650, 10,
+    'Термостат с корпусом в сборе. Температура открытия 87°C.',
+    'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller2Id, 'Помпа водяная', 'Hepu', 'P096', 'Volkswagen', 'Passat', 2019, 'Охлаждение', 4200, 2,
+    'Насос охлаждающей жидкости. Импеллер из нержавеющей стали.',
+    'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller3Id, 'Радиатор охлаждения', 'Nissens', '60764', 'Honda', 'Accord', 2019, 'Охлаждение', 8900, 2,
+    'Алюминиевый радиатор системы охлаждения. Оригинальный размер.',
+    'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller1Id, 'Расширительный бачок', 'Febi', '45286', 'BMW', '3 Series', 2019, 'Охлаждение', 2100, 6,
+    'Бачок охлаждающей жидкости с крышкой.',
+    'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller2Id, 'Шланг радиатора верхний', 'Gates', '05-3093', 'Toyota', 'RAV4', 2020, 'Охлаждение', 780, 14,
+    'Верхний патрубок радиатора. Армированная резина.',
+    'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400&q=80', 0);
+
+  // ── Трансмиссия ──
+  insertProduct.run(uuidv4(), seller2Id, 'ШРУС наружный в сборе', 'GSP', '861009', 'Nissan', 'Qashqai', 2020, 'Трансмиссия', 6500, 3,
+    'ШРУС наружный с пыльником в сборе. Полная замена.',
+    'https://images.unsplash.com/photo-1615906655593-ad0386982a0f?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller3Id, 'Пыльник ШРУСа наружный', 'SKF', 'VKJP 01350', 'Kia', 'Sportage', 2021, 'Трансмиссия', 850, 16,
+    'Пыльник наружного ШРУСа. Полиуретан. С хомутами.',
+    'https://images.unsplash.com/photo-1615906655593-ad0386982a0f?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller1Id, 'Масло АКПП ATF', 'ZF', 'S671090312', 'BMW', '5 Series', 2020, 'Трансмиссия', 2800, 10,
+    'Жидкость для АКПП ZF 8HP. Канистра 1 л.',
+    'https://images.unsplash.com/photo-1615906655593-ad0386982a0f?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller2Id, 'Сцепление (к-т)', 'Luk', '621 3028 09', 'Volkswagen', 'Golf', 2019, 'Трансмиссия', 12500, 2,
+    'Комплект сцепления: диск + корзина + выжимной подшипник.',
+    'https://images.unsplash.com/photo-1615906655593-ad0386982a0f?w=400&q=80', 0);
+
+  // ── Электрика ──
+  insertProduct.run(uuidv4(), seller2Id, 'Аккумулятор 60Ah 540A', 'Varta', 'C22', 'Toyota', 'Corolla', 2019, 'Электрика', 7200, 5,
+    'Пусковой ток 540A. Необслуживаемый. Гарантия 2 года.',
+    'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller3Id, 'Генератор', 'Bosch', '0 124 525 526', 'Ford', 'Focus', 2019, 'Электрика', 14800, 2,
+    'Восстановленный генератор. Ток отдачи 150A. Гарантия 12 мес.',
+    'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller1Id, 'Стартер', 'Valeo', '438277', 'Hyundai', 'Tucson', 2020, 'Электрика', 9800, 3,
+    'Восстановленный стартер. Мощность 1.4 кВт.',
+    'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller2Id, 'Датчик кислорода (лямбда)', 'Bosch', '0 258 006 027', 'Toyota', 'Camry', 2020, 'Электрика', 3600, 8,
+    'Датчик кислорода универсальный. 4 провода.',
+    'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller3Id, 'Датчик ABS передний', 'Bosch', '0 265 007 750', 'BMW', 'X3', 2021, 'Электрика', 2400, 7,
+    'Датчик скорости вращения колеса ABS. Левый/правый.',
+    'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller1Id, 'Лампа фары H7 (к-т)', 'Philips', '12972XV+S2', 'Audi', 'A6', 2020, 'Электрика', 1850, 20,
+    'Комплект ламп H7 Philips X-tremeVision+. +130% больше света.',
+    'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&q=80', 0);
+
+  // ── Кузов ──
+  insertProduct.run(uuidv4(), seller3Id, 'Бампер передний', 'TYG', 'VV04003BA', 'Volkswagen', 'Polo', 2020, 'Кузовные детали', 8500, 2,
+    'Передний бампер. Под покраску. Отверстия под парктроники.',
+    'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller2Id, 'Капот', 'TYG', 'HY10126BB', 'Hyundai', 'Solaris', 2021, 'Кузовные детали', 12000, 1,
+    'Капот стальной. Под покраску. Оригинальный размер.',
+    'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller1Id, 'Зеркало боковое левое', 'Prasco', 'TY3407153', 'Toyota', 'Corolla', 2020, 'Кузовные детали', 5600, 3,
+    'Зеркало левое с электроприводом, обогревом, грунтованное.',
+    'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400&q=80', 0);
+
+  insertProduct.run(uuidv4(), seller3Id, 'Порог правый', 'NovLine', 'NT-001', 'Kia', 'Rio', 2019, 'Кузовные детали', 3200, 4,
+    'Порог кузова правый. Стальной. Под варку.',
+    'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400&q=80', 0);
+
+  // ── Отзывы ──
   const insertReview = db.prepare(`
     INSERT INTO reviews (id, seller_id, reviewer_id, rating, comment)
     VALUES (?, ?, ?, ?, ?)
   `);
 
-  insertReview.run(uuidv4(), seller1Id, buyer1Id, 5, 'Отличный продавец! Быстрая доставка.');
-  insertReview.run(uuidv4(), seller1Id, buyer2Id, 4, 'Хорошее качество запчастей, рекомендую.');
-  insertReview.run(uuidv4(), seller2Id, buyer1Id, 5, 'Очень доволен покупкой, продавец на связи.');
+  insertReview.run(uuidv4(), seller1Id, buyer1Id, 5, 'Отличный продавец! Быстрая доставка, запчасть подошла с первого раза.');
+  insertReview.run(uuidv4(), seller1Id, buyer2Id, 4, 'Хорошее качество запчастей, рекомендую. Упаковка надёжная.');
+  insertReview.run(uuidv4(), seller2Id, buyer1Id, 5, 'Очень доволен покупкой, продавец на связи, отвечает быстро.');
+  insertReview.run(uuidv4(), seller3Id, buyer2Id, 5, 'МоторМаркет — проверенный продавец. Заказываю не первый раз.');
 
-  console.log('✅ Тестовые данные добавлены');
+  console.log('✅ Тестовые данные добавлены (50+ товаров)');
   console.log('   admin@nier.auto    / admin123');
   console.log('   seller1@nier.auto  / seller123');
   console.log('   buyer1@nier.auto   / buyer123');

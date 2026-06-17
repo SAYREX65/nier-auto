@@ -129,3 +129,8 @@
     justify-content: space-between;
   }
 }
+@media (max-width: 480px) {
+  .cart-item { grid-template-columns: 56px 1fr; gap: 12px; padding: 12px; }
+  .cart-item__image { width: 56px; height: 56px; font-size: 20px; }
+  .cart__summary { position: static; }
+}

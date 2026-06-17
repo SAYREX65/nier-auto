@@ -106,3 +106,136 @@
   .checkout__layout { grid-template-columns: 1fr; }
   .payment-options { grid-template-columns: 1fr; }
 }
+/* ── Модал оплаты ── */
+.pay-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.pay-modal {
+  background: var(--bg-surface, #1a1a2e);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  width: 100%;
+  max-width: 400px;
+  animation: modalIn 0.2s ease;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.pay-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.pay-modal__header h3 { font-size: 18px; margin: 0; }
+.pay-modal__close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+/* Превью карты */
+.pay-card-preview {
+  background: linear-gradient(135deg, #aa3bff 0%, #7b2ff7 50%, #4a1fa8 100%);
+  border-radius: 12px;
+  padding: 20px 22px;
+  margin-bottom: 24px;
+  color: #fff;
+  position: relative;
+  min-height: 120px;
+}
+.pay-card-preview__chip {
+  font-size: 22px;
+  letter-spacing: -6px;
+  margin-bottom: 16px;
+  opacity: 0.9;
+}
+.pay-card-preview__number {
+  font-size: 18px;
+  letter-spacing: 3px;
+  font-family: monospace;
+  margin-bottom: 16px;
+}
+.pay-card-preview__bottom {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  opacity: 0.85;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.pay-modal__form { display: flex; flex-direction: column; gap: 14px; }
+
+.pay-modal__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.pay-modal__btn {
+  width: 100%;
+  justify-content: center;
+  padding: 14px;
+  font-size: 15px;
+  margin-top: 4px;
+}
+
+.pay-modal__secure {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.pay-modal__spinner {
+  display: inline-block;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.pay-modal__success {
+  text-align: center;
+  padding: 32px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.pay-modal__success-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #22c55e;
+  color: #fff;
+  font-size: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: popIn 0.3s ease;
+}
+@keyframes popIn {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+
+@media (max-width: 480px) {
+  .pay-modal { padding: 20px 16px; }
+  .pay-card-preview__number { font-size: 15px; letter-spacing: 2px; }
+}

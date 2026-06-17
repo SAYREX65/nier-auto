@@ -200,3 +200,8 @@
     grid-template-columns: 1fr;
   }
 }
+@media (max-width: 480px) {
+  .seller-tabs { overflow-x: auto; white-space: nowrap; padding-bottom: 4px; }
+  .seller-form__actions { flex-direction: column; }
+  .seller-form__actions .btn { width: 100%; justify-content: center; }
+}
