@@ -239,3 +239,50 @@
   .pay-modal { padding: 20px 16px; }
   .pay-card-preview__number { font-size: 15px; letter-spacing: 2px; }
 }
+
+/* ── Модал условий ── */
+.pay-modal--terms { max-width: 440px; }
+
+.terms__icon {
+  font-size: 48px;
+  text-align: center;
+  margin: 8px 0 4px;
+}
+
+.terms__title {
+  text-align: center;
+  font-size: 17px;
+  margin: 0 0 16px;
+  color: var(--text-primary);
+}
+
+.terms__list {
+  padding: 0 0 0 18px;
+  margin: 0 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.terms__checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text-primary);
+  cursor: pointer;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.terms__checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}

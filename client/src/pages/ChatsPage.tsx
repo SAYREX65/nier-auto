@@ -34,9 +34,31 @@ export default function ChatsPage() {
   const [text, setText]             = useState('');
   const [loading, setLoading]       = useState(true);
   const [sending, setSending]       = useState(false);
-  const messagesEndRef              = useRef<HTMLDivElement>(null);
-  const pollRef                     = useRef<ReturnType<typeof setInterval>>();
-  const chatPollRef                 = useRef<ReturnType<typeof setInterval>>();
+
+  const messagesEndRef  = useRef<HTMLDivElement>(null);
+  const messagesBodyRef = useRef<HTMLDivElement>(null);
+  const pollRef         = useRef<ReturnType<typeof setInterval>>();
+  const chatPollRef     = useRef<ReturnType<typeof setInterval>>();
+  const prevCountRef    = useRef<number>(0);   // кол-во сообщений в прошлый раз
+  const isFirstLoad     = useRef<boolean>(true); // первая загрузка чата
+
+  // Скролл вниз — только если нужно
+  const scrollToBottom = useCallback((force = false) => {
+    const body = messagesBodyRef.current;
+    if (!body) return;
+
+    if (force) {
+      // Принудительно — при открытии чата или отправке своего сообщения
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+
+    // Умный скролл: только если пользователь уже почти внизу (< 120px до конца)
+    const distanceFromBottom = body.scrollHeight - body.scrollTop - body.clientHeight;
+    if (distanceFromBottom < 120) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
 
   const fetchChats = useCallback(() => {
     api.get('/chats').then(r => {
@@ -47,31 +69,52 @@ export default function ChatsPage() {
 
   useEffect(() => {
     fetchChats();
-    // Обновляем список чатов каждые 5 сек
     chatPollRef.current = setInterval(fetchChats, 5000);
     return () => clearInterval(chatPollRef.current);
   }, [fetchChats]);
 
-  const fetchMessages = useCallback(() => {
+  const fetchMessages = useCallback((forceScroll = false) => {
     if (!activeChat) return;
     api.get(`/chats/${activeChat.id}/messages`).then(r => {
-      setMessages(r.data);
-      // После загрузки — сбрасываем unread в списке чатов
+      const newMessages: Message[] = r.data;
+      const newCount = newMessages.length;
+      const prevCount = prevCountRef.current;
+      const hasNewMessages = newCount > prevCount;
+
+      setMessages(newMessages);
+      prevCountRef.current = newCount;
+
       setChats(prev =>
         prev.map(c => c.id === activeChat.id ? { ...c, unread_count: 0 } : c)
       );
+
       setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        if (forceScroll || isFirstLoad.current) {
+          // Первая загрузка чата — прыгаем вниз без анимации
+          if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: isFirstLoad.current ? 'auto' : 'smooth' });
+          }
+          isFirstLoad.current = false;
+        } else if (hasNewMessages) {
+          // Пришли новые сообщения — умный скролл
+          scrollToBottom(false);
+        }
+        // Если новых сообщений нет — ничего не делаем, не трогаем позицию
       }, 50);
     });
-  }, [activeChat]);
+  }, [activeChat, scrollToBottom]);
 
+  // При смене чата — сбрасываем счётчики и грузим заново
   useEffect(() => {
-    fetchMessages();
+    if (!activeChat) return;
+    prevCountRef.current = 0;
+    isFirstLoad.current  = true;
+
+    fetchMessages(true);
     clearInterval(pollRef.current);
-    pollRef.current = setInterval(fetchMessages, 3000);
+    pollRef.current = setInterval(() => fetchMessages(false), 3000);
     return () => clearInterval(pollRef.current);
-  }, [fetchMessages]);
+  }, [activeChat?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSend = async () => {
     if (!text.trim() || !activeChat || sending) return;
@@ -79,7 +122,8 @@ export default function ChatsPage() {
     try {
       await api.post(`/chats/${activeChat.id}/messages`, { text });
       setText('');
-      fetchMessages();
+      // После отправки своего сообщения — скролл вниз принудительно
+      fetchMessages(true);
       fetchChats();
     } finally {
       setSending(false);
@@ -179,7 +223,7 @@ export default function ChatsPage() {
                 </div>
 
                 {/* Сообщения */}
-                <div className="chat-window__messages">
+                <div className="chat-window__messages" ref={messagesBodyRef}>
                   {messages.length === 0 ? (
                     <div className="chat-window__no-messages">
                       <p className="text-muted">Нет сообщений. Напишите первым!</p>
@@ -210,7 +254,6 @@ export default function ChatsPage() {
                                   hour: '2-digit', minute: '2-digit'
                                 })}
                               </span>
-                              {/* Галочка прочтения — только для моих сообщений */}
                               {isMe && (
                                 <span className={`message__check ${msg.is_read ? 'message__check--read' : ''}`}>
                                   {msg.is_read ? '✓✓' : '✓'}

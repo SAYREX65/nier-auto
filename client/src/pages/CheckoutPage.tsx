@@ -8,55 +8,33 @@ export default function CheckoutPage() {
   const { items, totalAmount: total, clearCart } = useCart();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({
-    address: '',
-    payment_method: 'card',
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [form, setForm] = useState({ address: '', payment_method: 'online' });
+  const [loading, setLoading]         = useState(false);
+  const [error, setError]             = useState('');
+
+  // Модал карты
   const [showPayModal, setShowPayModal] = useState(false);
-  const [cardForm, setCardForm] = useState({
-    number: '',
-    name: '',
-    expiry: '',
-    cvv: '',
-  });
-  const [cardLoading, setCardLoading] = useState(false);
-  const [cardSuccess, setCardSuccess] = useState(false);
+  const [cardForm, setCardForm]         = useState({ number: '', name: '', expiry: '', cvv: '' });
+  const [cardLoading, setCardLoading]   = useState(false);
+  const [cardSuccess, setCardSuccess]   = useState(false);
+
+  // Модал условий (наличные / при получении)
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [termsAccepted, setTermsAccepted]   = useState(false);
 
   const formatCardNumber = (v: string) =>
     v.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim();
-
   const formatExpiry = (v: string) => {
     const d = v.replace(/\D/g, '').slice(0, 4);
     return d.length > 2 ? d.slice(0, 2) + '/' + d.slice(2) : d;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.address.trim()) {
-      setError('Укажите адрес доставки');
-      return;
-    }
-
-    if (form.payment_method === 'online') {
-      setShowPayModal(true);
-      return;
-    }
-
-    await placeOrder();
   };
 
   const placeOrder = async () => {
     setLoading(true);
     setError('');
     try {
-      const orderItems = items.map(i => ({
-        product_id: i.product_id,
-        quantity: i.quantity,
-      }));
       const { data } = await api.post('/orders', {
-        items: orderItems,
+        items: items.map(i => ({ product_id: i.product_id, quantity: i.quantity })),
         address: form.address,
         payment_method: form.payment_method,
       });
@@ -69,17 +47,27 @@ export default function CheckoutPage() {
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.address.trim()) { setError('Укажите адрес доставки'); return; }
+    setError('');
+
+    if (form.payment_method === 'online') {
+      setShowPayModal(true);
+    } else {
+      // наличные или при получении — показываем условия
+      setShowTermsModal(true);
+    }
+  };
+
   const handleCardPay = async (e: React.FormEvent) => {
     e.preventDefault();
-    const digits = cardForm.number.replace(/\s/g, '');
-    if (digits.length < 16) { setError('Введите корректный номер карты'); return; }
+    if (cardForm.number.replace(/\s/g, '').length < 16) { setError('Введите корректный номер карты'); return; }
     if (!cardForm.name.trim()) { setError('Введите имя держателя'); return; }
-    if (cardForm.expiry.length < 5) { setError('Введите срок действия'); return; }
-    if (cardForm.cvv.length < 3) { setError('Введите CVV'); return; }
-
+    if (cardForm.expiry.length < 5)  { setError('Введите срок действия'); return; }
+    if (cardForm.cvv.length < 3)     { setError('Введите CVV'); return; }
     setCardLoading(true);
     setError('');
-    // Имитация обработки платежа
     await new Promise(r => setTimeout(r, 2000));
     setCardLoading(false);
     setCardSuccess(true);
@@ -88,10 +76,16 @@ export default function CheckoutPage() {
     await placeOrder();
   };
 
-  if (items.length === 0) {
-    navigate('/cart');
-    return null;
-  }
+  const handleTermsConfirm = () => {
+    if (!termsAccepted) { setError('Необходимо принять условия'); return; }
+    setShowTermsModal(false);
+    setError('');
+    placeOrder();
+  };
+
+  const paymentLabel = PAYMENT_METHODS.find(p => p.value === form.payment_method)?.label ?? '';
+
+  if (items.length === 0) { navigate('/cart'); return null; }
 
   return (
     <div className="page">
@@ -99,7 +93,6 @@ export default function CheckoutPage() {
         <h1 className="page-title">Оформление заказа</h1>
 
         <div className="checkout__layout">
-
           <form className="checkout__form" onSubmit={handleSubmit}>
 
             <div className="checkout__section card">
@@ -121,9 +114,7 @@ export default function CheckoutPage() {
                 {PAYMENT_METHODS.map(pm => (
                   <label key={pm.value} className="payment-option">
                     <input
-                      type="radio"
-                      name="payment"
-                      value={pm.value}
+                      type="radio" name="payment" value={pm.value}
                       checked={form.payment_method === pm.value}
                       onChange={() => setForm(f => ({ ...f, payment_method: pm.value }))}
                     />
@@ -138,14 +129,9 @@ export default function CheckoutPage() {
 
             {error && <p className="form-error">{error}</p>}
 
-            <button
-              type="submit"
-              className="btn btn-primary checkout__submit"
-              disabled={loading}
-            >
+            <button type="submit" className="btn btn-primary checkout__submit" disabled={loading}>
               {loading ? 'Оформляем...' : `Подтвердить заказ — ${total.toLocaleString('ru-RU')} ₽`}
             </button>
-
           </form>
 
           <div className="checkout__summary card">
@@ -168,11 +154,10 @@ export default function CheckoutPage() {
               </span>
             </div>
           </div>
-
         </div>
       </div>
 
-      {/* Модал оплаты картой */}
+      {/* ── Модал оплаты картой ── */}
       {showPayModal && (
         <div className="pay-modal-overlay" onClick={() => !cardLoading && setShowPayModal(false)}>
           <div className="pay-modal" onClick={e => e.stopPropagation()}>
@@ -187,7 +172,6 @@ export default function CheckoutPage() {
                   <h3>Оплата картой</h3>
                   <button className="pay-modal__close" onClick={() => setShowPayModal(false)}>✕</button>
                 </div>
-
                 <div className="pay-card-preview">
                   <div className="pay-card-preview__chip">■■</div>
                   <div className="pay-card-preview__number">
@@ -198,59 +182,35 @@ export default function CheckoutPage() {
                     <span>{cardForm.expiry || 'MM/YY'}</span>
                   </div>
                 </div>
-
                 <form className="pay-modal__form" onSubmit={handleCardPay}>
                   <div className="form-group">
                     <label className="form-label">Номер карты</label>
-                    <input
-                      className="input"
-                      placeholder="0000 0000 0000 0000"
-                      value={cardForm.number}
-                      maxLength={19}
-                      onChange={e => setCardForm(f => ({ ...f, number: formatCardNumber(e.target.value) }))}
-                      inputMode="numeric"
-                    />
+                    <input className="input" placeholder="0000 0000 0000 0000"
+                      value={cardForm.number} maxLength={19} inputMode="numeric"
+                      onChange={e => setCardForm(f => ({ ...f, number: formatCardNumber(e.target.value) }))} />
                   </div>
                   <div className="form-group">
                     <label className="form-label">Имя держателя</label>
-                    <input
-                      className="input"
-                      placeholder="IVAN PETROV"
+                    <input className="input" placeholder="IVAN PETROV"
                       value={cardForm.name}
-                      onChange={e => setCardForm(f => ({ ...f, name: e.target.value.toUpperCase() }))}
-                    />
+                      onChange={e => setCardForm(f => ({ ...f, name: e.target.value.toUpperCase() }))} />
                   </div>
                   <div className="pay-modal__row">
                     <div className="form-group">
                       <label className="form-label">Срок действия</label>
-                      <input
-                        className="input"
-                        placeholder="MM/YY"
-                        value={cardForm.expiry}
-                        maxLength={5}
-                        onChange={e => setCardForm(f => ({ ...f, expiry: formatExpiry(e.target.value) }))}
-                        inputMode="numeric"
-                      />
+                      <input className="input" placeholder="MM/YY"
+                        value={cardForm.expiry} maxLength={5} inputMode="numeric"
+                        onChange={e => setCardForm(f => ({ ...f, expiry: formatExpiry(e.target.value) }))} />
                     </div>
                     <div className="form-group">
                       <label className="form-label">CVV</label>
-                      <input
-                        className="input"
-                        placeholder="•••"
-                        type="password"
-                        value={cardForm.cvv}
-                        maxLength={3}
-                        onChange={e => setCardForm(f => ({ ...f, cvv: e.target.value.replace(/\D/g, '') }))}
-                        inputMode="numeric"
-                      />
+                      <input className="input" placeholder="•••" type="password"
+                        value={cardForm.cvv} maxLength={3} inputMode="numeric"
+                        onChange={e => setCardForm(f => ({ ...f, cvv: e.target.value.replace(/\D/g, '') }))} />
                     </div>
                   </div>
                   {error && <p className="form-error">{error}</p>}
-                  <button
-                    type="submit"
-                    className="btn btn-primary pay-modal__btn"
-                    disabled={cardLoading}
-                  >
+                  <button type="submit" className="btn btn-primary pay-modal__btn" disabled={cardLoading}>
                     {cardLoading
                       ? <span className="pay-modal__spinner">⟳</span>
                       : `Оплатить ${total.toLocaleString('ru-RU')} ₽`}
@@ -262,12 +222,61 @@ export default function CheckoutPage() {
           </div>
         </div>
       )}
+
+      {/* ── Модал условий (наличные / при получении) ── */}
+      {showTermsModal && (
+        <div className="pay-modal-overlay" onClick={() => setShowTermsModal(false)}>
+          <div className="pay-modal pay-modal--terms" onClick={e => e.stopPropagation()}>
+            <div className="pay-modal__header">
+              <h3>Условия оплаты</h3>
+              <button className="pay-modal__close" onClick={() => setShowTermsModal(false)}>✕</button>
+            </div>
+            <div className="terms__icon">
+              {form.payment_method === 'cash' ? '💵' : '📦'}
+            </div>
+            <h4 className="terms__title">{paymentLabel}</h4>
+            <ul className="terms__list">
+              {form.payment_method === 'cash' ? (
+                <>
+                  <li>Оплата производится наличными в пункте выдачи или курьеру при получении заказа.</li>
+                  <li>Пожалуйста, подготовьте точную сумму — <strong>{total.toLocaleString('ru-RU')} ₽</strong>.</li>
+                  <li>Квитанция об оплате выдаётся на руки в момент расчёта.</li>
+                  <li>Отмена заказа возможна до момента отправки товара продавцом.</li>
+                </>
+              ) : (
+                <>
+                  <li>Оплата производится при получении заказа у курьера или в пункте выдачи.</li>
+                  <li>Принимаются банковские карты и наличные. Сумма к оплате: <strong>{total.toLocaleString('ru-RU')} ₽</strong>.</li>
+                  <li>Проверьте товар до оплаты — после подписания накладной претензии не принимаются.</li>
+                  <li>Отмена заказа возможна до момента отправки товара продавцом.</li>
+                </>
+              )}
+            </ul>
+            <label className="terms__checkbox">
+              <input
+                type="checkbox"
+                checked={termsAccepted}
+                onChange={e => { setTermsAccepted(e.target.checked); setError(''); }}
+              />
+              <span>Я ознакомился с условиями и согласен с ними</span>
+            </label>
+            {error && <p className="form-error">{error}</p>}
+            <button
+              className="btn btn-primary pay-modal__btn"
+              onClick={handleTermsConfirm}
+              disabled={loading}
+            >
+              {loading ? 'Оформляем...' : 'Подтвердить заказ'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 const PAYMENT_METHODS = [
-  { value: 'card',   label: 'Наличные',       icon: '💵' },
-  { value: 'online', label: 'Картой онлайн',  icon: '💳' },
-  { value: 'cash',   label: 'При получении',  icon: '📦' },
+  { value: 'online', label: 'Картой онлайн',    icon: '💳' },
+  { value: 'card',   label: 'При получении',     icon: '📦' },
+  { value: 'cash',   label: 'Наличными',         icon: '💵' },
 ];
