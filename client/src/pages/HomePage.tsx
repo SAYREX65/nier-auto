@@ -168,7 +168,11 @@ export default function HomePage() {
               to={`/catalog?part_type=${encodeURIComponent(cat.type)}`}
               className="category-card card"
             >
-              <span className="category-card__icon">{cat.icon}</span>
+              <img
+                className="category-card__icon"
+                src={cat.icon}
+                alt={cat.type}
+              />
               <span className="category-card__name">{cat.type}</span>
             </Link>
           ))}
@@ -180,12 +184,12 @@ export default function HomePage() {
 }
 
 const CATEGORIES = [
-  { type: 'Тормозная система',  icon: '🔴' },
-  { type: 'Двигатель',          icon: '⚙️' },
-  { type: 'Подвеска',           icon: '🔩' },
-  { type: 'Рулевое управление', icon: '🎯' },
-  { type: 'Электрика',          icon: '⚡' },
-  { type: 'Кузов',              icon: '🚗' },
-  { type: 'Трансмиссия',        icon: '🔧' },
-  { type: 'Охлаждение',         icon: '❄️' },
+  { type: 'Тормозная система',  icon: '/images/icons/brake.svg'            },
+  { type: 'Двигатель',          icon: '/images/icons/engine.svg'           },
+  { type: 'Подвеска',           icon: '/images/icons/pendant.svg'          },
+  { type: 'Рулевое управление', icon: '/images/icons/steering_control.svg' },
+  { type: 'Электрика',          icon: '/images/icons/electrics.svg'        },
+  { type: 'Кузов',              icon: '/images/icons/bodywork.svg'         },
+  { type: 'Трансмиссия',        icon: '/images/icons/transmission.svg'     },
+  { type: 'Охлаждение',         icon: '/images/icons/snowflake.svg'        },
 ];
